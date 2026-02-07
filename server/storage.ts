@@ -3,10 +3,13 @@ import { db } from "./db";
 import {
   goldPrices,
   predictions,
+  backtests,
   type InsertGoldPrice,
   type InsertPrediction,
+  type InsertBacktest,
   type GoldPrice,
-  type Prediction
+  type Prediction,
+  type Backtest
 } from "@shared/schema";
 import { eq, desc, asc } from "drizzle-orm";
 
@@ -19,11 +22,13 @@ export interface IStorage {
   getPredictions(): Promise<Prediction[]>;
   createPrediction(prediction: InsertPrediction): Promise<Prediction>;
   clearPredictions(): Promise<void>;
+
+  getBacktests(): Promise<Backtest[]>;
+  createBacktest(backtest: InsertBacktest): Promise<Backtest>;
 }
 
 export class DatabaseStorage implements IStorage {
   async getGoldPrices(): Promise<GoldPrice[]> {
-    // Return sorted by date ascending for charts
     return await db.select().from(goldPrices).orderBy(asc(goldPrices.date));
   }
 
@@ -39,8 +44,6 @@ export class DatabaseStorage implements IStorage {
 
   async bulkCreateGoldPrices(prices: InsertGoldPrice[]): Promise<void> {
     if (prices.length === 0) return;
-    // Process in chunks to avoid query limits if necessary, but Drizzle handles batching well usually.
-    // Using onConflictDoNothing to avoid duplicates
     await db.insert(goldPrices).values(prices).onConflictDoNothing();
   }
 
@@ -55,6 +58,15 @@ export class DatabaseStorage implements IStorage {
 
   async clearPredictions(): Promise<void> {
     await db.delete(predictions);
+  }
+
+  async getBacktests(): Promise<Backtest[]> {
+    return await db.select().from(backtests).orderBy(desc(backtests.createdAt));
+  }
+
+  async createBacktest(backtest: InsertBacktest): Promise<Backtest> {
+    const [created] = await db.insert(backtests).values(backtest).returning();
+    return created;
   }
 }
 

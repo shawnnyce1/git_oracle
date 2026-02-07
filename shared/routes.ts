@@ -1,6 +1,6 @@
 
 import { z } from 'zod';
-import { insertGoldPriceSchema, goldPrices, predictions } from './schema';
+import { insertGoldPriceSchema, goldPrices, predictions, backtests } from './schema';
 
 export const errorSchemas = {
   validation: z.object({
@@ -51,6 +51,28 @@ export const api = {
           message: z.string(),
           count: z.number(),
         }),
+      },
+    },
+  },
+  backtest: {
+    run: {
+      method: 'POST' as const,
+      path: '/api/backtest' as const,
+      input: z.object({
+        startDate: z.string(),
+        endDate: z.string(),
+        shortWindow: z.number().default(50),
+        longWindow: z.number().default(200),
+      }),
+      responses: {
+        200: z.custom<any>(), // BacktestResult
+      },
+    },
+    list: {
+      method: 'GET' as const,
+      path: '/api/backtest' as const,
+      responses: {
+        200: z.array(z.custom<typeof backtests.$inferSelect>()),
       },
     },
   },
