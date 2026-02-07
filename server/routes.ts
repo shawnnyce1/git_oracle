@@ -8,7 +8,7 @@ import fs from "fs";
 import path from "path";
 
 // Polygon API Configuration
-const POLYGON_API_KEY = "r37aFrmgOfMZphPTMQi336fw_WLHLAUA"; 
+const POLYGON_API_KEY = process.env.POLYGON_API_KEY; 
 const TICKER = "C:XAUUSD";
 
 export async function registerRoutes(

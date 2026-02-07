@@ -7,7 +7,9 @@ import { z } from "zod";
 
 export const goldPrices = pgTable("gold_prices", {
   id: serial("id").primaryKey(),
-  date: text("date").notNull().unique(), // YYYY-MM-DD
+  date: text("date").notNull(), // ISO string or YYYY-MM-DD
+  timestamp: timestamp("timestamp").notNull(),
+  timeframe: text("timeframe").notNull().default("day"), // "15min", "1hour", "4hour", "day"
   open: numeric("open").notNull(),
   high: numeric("high").notNull(),
   low: numeric("low").notNull(),
@@ -18,10 +20,13 @@ export const goldPrices = pgTable("gold_prices", {
 
 export const predictions = pgTable("predictions", {
   id: serial("id").primaryKey(),
-  date: text("date").notNull(), // The date the prediction is for
-  signal: text("signal").notNull(), // "BUY", "SELL", "HOLD"
+  date: text("date").notNull(),
+  signal: text("signal").notNull(),
   confidence: numeric("confidence"),
-  reason: text("reason"), // e.g. "SMA Crossover"
+  reason: text("reason"),
+  entryPrice: numeric("entry_price"),
+  exitPrice: numeric("exit_price"),
+  notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
