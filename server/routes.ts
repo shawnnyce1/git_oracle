@@ -149,6 +149,8 @@ export async function registerRoutes(
       return sum / period;
     };
 
+    const tradeHistory: any[] = [];
+
     for (let i = longWindow; i < filtered.length; i++) {
       const sWindow = calculateSMA(filtered, shortWindow, i);
       const lWindow = calculateSMA(filtered, longWindow, i);
@@ -156,10 +158,10 @@ export async function registerRoutes(
 
       if (sWindow > lWindow && lastSignal !== "BUY") {
         position = balance / price;
-        trades.push({ entryDate: filtered[i].date, entryPrice: price, type: 'BUY' as const });
+        tradeHistory.push({ entryDate: filtered[i].date, entryPrice: price, type: 'BUY' as const, exitDate: '', exitPrice: 0, profit: 0 });
         lastSignal = "BUY";
       } else if (sWindow < lWindow && lastSignal === "BUY") {
-        const entry = trades[trades.length - 1];
+        const entry = tradeHistory[tradeHistory.length - 1];
         balance = position * price;
         entry.exitDate = filtered[i].date;
         entry.exitPrice = price;
@@ -170,17 +172,17 @@ export async function registerRoutes(
 
     const result = {
       totalReturn: ((balance - 10000) / 10000) * 100,
-      winRate: (trades.filter(t => (t as any).profit > 0).length / trades.length) * 100 || 0,
-      tradesCount: trades.length,
-      trades
+      winRate: (tradeHistory.filter(t => t.profit > 0).length / tradeHistory.length) * 100 || 0,
+      tradesCount: tradeHistory.length,
+      trades: tradeHistory
     };
 
     await storage.createBacktest({
       name: `Backtest ${shortWindow}/${longWindow}`,
       startDate,
       endDate,
-      totalReturn: result.totalReturn.toString(),
-      winRate: result.winRate.toString(),
+      totalReturn: result.totalReturn.toFixed(2),
+      winRate: result.winRate.toFixed(2),
       tradesCount: result.tradesCount,
       config: JSON.stringify({ shortWindow, longWindow })
     });

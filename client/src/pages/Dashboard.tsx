@@ -186,7 +186,7 @@ export default function Dashboard() {
           >
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-display font-bold text-lg">Recent AI Signals</h3>
-              <Button variant="link" className="text-primary text-xs">View All</Button>
+              <Button variant="ghost" className="text-primary text-xs">View All</Button>
             </div>
             
             <div className="space-y-4">
@@ -224,7 +224,7 @@ export default function Dashboard() {
           >
             <div className="flex items-center justify-between mb-6">
               <h3 className="font-display font-bold text-lg">Market Data Feed</h3>
-              <Button variant="link" className="text-primary text-xs">Full History</Button>
+              <Button variant="ghost" className="text-primary text-xs">Full History</Button>
             </div>
 
             <div className="overflow-hidden rounded-xl border border-white/5">
